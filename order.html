@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Đặt hàng Vuong Store</title>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link type="text/css" rel="stylesheet" href="css/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="css/nprogress.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="css/custom.css" media="screen,projection" />
+    <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body ng-app="app" ng-controller="myCtrl">
+    <nav class="amber darken-2" role="navigation">
+        <div class="nav-wrapper container">
+            <a id="logo-container" href="#" class="brand-logo center">Vuong Store</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <h4>Mã đơn hàng : {{id}}</h4>
+            <h4>Thông tin giao hàng</h4>
+            <div class="row">
+                <div class="col s6">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input id="receiver" ng-model="order.receiver" type="text" class="validate">
+                            <label id="lblReceiver" for="receiver">Tên người nhận</label>
+                        </div>
+                    </div>
+                <div class="col s6">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">phone</i>
+                        <input id="phone" ng-model="order.phone" type="text" class="validate">
+                        <label id="lblPhone" for="phone">Số điện thoại</label>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="col s6">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">home</i>
+                        <input id="address" ng-model="order.address" type="text" class="validate">
+                        <label id="lblAdress" for="address">Địa chỉ giao hàng</label>
+                    </div>
+                </div>
+                <div class="col s6">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">comment</i>
+                        <textarea id="note" ng-model="order.note" class="materialize-textarea"></textarea>
+                        <label id="lblNotee" for="note">Ghi chú (Thời điểm giao, gặp anh/chị)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h4>Sản phẩm đã đặt</h4>
+            <table id="cart-order" class="bordered">
+                <tr>
+                    <th>Tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Hàng cần giao</th>
+                    <th>Ghi chú </th>
+                </tr>
+               <tr>
+                   <td>{{order.receiver}}</td>
+                   <td>{{order.phone}}</td>
+                   <td>{{order.address}}</td>
+                   <td>
+                       <div ng-repeat="item in order.cart">
+                          {{item.type}} : {{item.color}}, {{item.name | uppercase}} {{item.charm ? ', ' + item.charm : ''}}
+                       </div>
+                   </th>
+                   <td>{{order.note}}</td>
+               </tr>
+                <tr>
+                    <td class="right-align" colspan="5">Tổng cộng: {{order.cart.length || 0}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <footer class="page-footer amber darken-2">
+        <div class="footer-copyright">
+            <div class="container">
+                Copyright by <a class="orange-text text-lighten-3" href="http://materializecss.com">H.Pham | Aswig Solutions</a>
+            </div>
+        </div>
+    </footer>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+    <script type="text/javascript" src="https://code.angularjs.org/1.4.2/angular-route.min.js"></script>
+    <script>
+    var app = angular.module('app', ['ngRoute']);
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', '$timeout', function($scope, $http, $location, $timeout) {
+
+        loadOrder();
+
+        function loadOrder() {
+            $scope.id = $location.search().id;
+            var apiLink = 'https://api.mongolab.com/api/1/databases/vuong_shop_order/collections/orders/' + $scope.id + '?apiKey=Rds2DpkLY7_VqsMfmgfSo_EdzafbQvOs';
+            $http.get(apiLink).then(function(rs) {
+                $scope.order = rs.data;
+
+                //Fix the weird binding bug
+                $timeout(function() {
+                    $('#receiver, #phone, #address, #note').trigger('change');
+                });
+
+            });
+        };
+    }]);
+    </script>
+</body>
+
+</html>
